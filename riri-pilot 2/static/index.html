@@ -1,0 +1,295 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RiRi — ENG110 Rhetorical Instrument</title>
+<style>
+:root{
+  --ink:#1d1a17; --paper:#fbf9f5; --panel:#ffffff; --line:#d8d2c8;
+  --maroon:#6e0f1e; --maroon-dk:#4d0a15; --gold:#b08d3f; --muted:#6b645a;
+  --focus:#1a4fd6;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{font:16px/1.55 "Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+  color:var(--ink);background:var(--paper);display:flex;flex-direction:column}
+:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+button,input,textarea,select{font:inherit;color:inherit}
+.skip{position:absolute;left:-999px}.skip:focus{left:8px;top:8px;background:#fff;padding:.5rem;z-index:9}
+
+/* disclosure banner — persistent, first in DOM */
+#disclosure{background:var(--maroon);color:#fff;padding:.5rem 1rem;
+  font-family:ui-sans-serif,system-ui,sans-serif;font-size:.85rem;letter-spacing:.02em}
+#disclosure strong{color:#f2d9a0}
+
+header.site{display:flex;align-items:baseline;gap:.75rem;padding:.9rem 1.25rem;
+  border-bottom:2px solid var(--maroon)}
+header.site h1{margin:0;font-size:1.5rem;font-weight:700;letter-spacing:.01em}
+header.site h1 .dot{color:var(--gold)}
+header.site .sub{color:var(--muted);font-size:.85rem;font-family:ui-sans-serif,system-ui,sans-serif}
+header.site .right{margin-left:auto;font-family:ui-sans-serif,system-ui,sans-serif;font-size:.8rem;color:var(--muted)}
+
+main{flex:1;display:flex;min-height:0}
+.view{display:none;width:100%}
+.view.active{display:flex}
+
+/* card views (login, setup) */
+.card-wrap{align-items:flex-start;justify-content:center;padding:3rem 1rem}
+.card{background:var(--panel);border:1px solid var(--line);max-width:34rem;width:100%;
+  padding:2rem;border-top:4px solid var(--maroon)}
+.card h2{margin:0 0 .25rem;font-size:1.2rem}
+.card p.lead{margin:.25rem 0 1.25rem;color:var(--muted);font-size:.95rem}
+label{display:block;font-family:ui-sans-serif,system-ui,sans-serif;font-size:.82rem;
+  font-weight:600;letter-spacing:.03em;margin:1rem 0 .3rem}
+input[type=text],textarea,select{width:100%;padding:.55rem .65rem;border:1px solid var(--line);
+  background:#fff;border-radius:2px}
+textarea{min-height:5.5rem;resize:vertical}
+.btn{display:inline-block;background:var(--maroon);color:#fff;border:0;padding:.6rem 1.2rem;
+  border-radius:2px;cursor:pointer;font-family:ui-sans-serif,system-ui,sans-serif;
+  font-weight:600;font-size:.9rem;margin-top:1rem}
+.btn:hover{background:var(--maroon-dk)}
+.btn.ghost{background:transparent;color:var(--maroon);border:1px solid var(--maroon)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.err{color:#8f1010;font-family:ui-sans-serif,system-ui,sans-serif;font-size:.85rem;margin-top:.6rem;min-height:1.2em}
+fieldset{border:1px solid var(--line);margin:1rem 0;padding: .75rem 1rem}
+legend{font-family:ui-sans-serif,system-ui,sans-serif;font-size:.82rem;font-weight:600}
+.radio-row{display:flex;gap:1.5rem;margin:.4rem 0}
+.radio-row label{margin:0;font-weight:400;display:flex;gap:.4rem;align-items:center;font-size:.95rem;font-family:inherit}
+
+/* chat view */
+#chatView{flex-direction:row}
+aside#rail{width:15rem;border-right:1px solid var(--line);padding:1.25rem;
+  font-family:ui-sans-serif,system-ui,sans-serif;font-size:.85rem;background:var(--panel)}
+aside#rail h3{margin:0 0 .5rem;font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+ol.stages{list-style:none;margin:0 0 1.5rem;padding:0}
+ol.stages li{padding:.45rem .6rem;border-left:3px solid var(--line);color:var(--muted)}
+ol.stages li.now{border-left-color:var(--maroon);color:var(--ink);font-weight:700;background:#f6efe4}
+ol.stages li.done{border-left-color:var(--gold);color:var(--ink)}
+#railMeta{color:var(--muted)}
+.chat-col{flex:1;display:flex;flex-direction:column;min-width:0}
+#log{flex:1;overflow-y:auto;padding:1.25rem;display:flex;flex-direction:column;gap:1rem}
+.msg{max-width:46rem;padding:.75rem 1rem;border-radius:2px;white-space:pre-wrap}
+.msg.user{align-self:flex-end;background:#efe8db;border:1px solid var(--line)}
+.msg.riri{align-self:flex-start;background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--maroon)}
+.msg .who{display:block;font-family:ui-sans-serif,system-ui,sans-serif;font-size:.7rem;
+  letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:.25rem}
+form#composer{display:flex;gap:.5rem;padding:1rem 1.25rem;border-top:1px solid var(--line);background:var(--panel)}
+form#composer textarea{flex:1;min-height:3rem}
+#gateBox{border-top:2px solid var(--gold);background:#fdf8ee;padding:1rem 1.25rem}
+#gateBox summary{cursor:pointer;font-family:ui-sans-serif,system-ui,sans-serif;font-weight:600;font-size:.9rem}
+@media (max-width:760px){#chatView{flex-direction:column}aside#rail{width:100%;border-right:0;border-bottom:1px solid var(--line)}}
+@media (prefers-reduced-motion: no-preference){.msg{animation:rise .15s ease-out}@keyframes rise{from{transform:translateY(4px);opacity:.4}to{transform:none;opacity:1}}}
+</style>
+</head>
+<body>
+<a class="skip" href="#log">Skip to conversation</a>
+<div id="disclosure" role="note"><strong>AI disclosure:</strong> RiRi is an AI agent, not a person. In Artifact Mode it simulates an author from instructor-curated materials. Session logs are recorded anonymously for research.</div>
+<header class="site">
+  <h1>RiRi<span class="dot">.</span></h1>
+  <span class="sub">aRtificial Intelligence Rhetorical Instrument · ENG110</span>
+  <span class="right" id="whoami"></span>
+</header>
+<main>
+
+<!-- LOGIN -->
+<section id="loginView" class="view card-wrap" aria-label="Sign in">
+  <div class="card">
+    <h2>Enter your access token</h2>
+    <p class="lead">It's on the card from your instructor and looks like <code>RIRI-XXXX-XXXX</code>. No account, no email — the token is your only ID.</p>
+    <form id="loginForm">
+      <label for="tok">Access token</label>
+      <input id="tok" type="text" autocomplete="off" spellcheck="false" placeholder="RIRI-____-____" required>
+      <button class="btn" type="submit">Start</button>
+      <p class="err" id="loginErr" role="alert"></p>
+    </form>
+  </div>
+</section>
+
+<!-- SETUP -->
+<section id="setupView" class="view card-wrap" aria-label="Session setup">
+  <div class="card">
+    <h2>Set up this session</h2>
+    <fieldset>
+      <legend>Voice Brief</legend>
+      <div class="radio-row">
+        <label><input type="radio" name="vb" value="have" checked> I have my .md file</label>
+        <label><input type="radio" name="vb" value="make"> Create one (first time)</label>
+      </div>
+      <div id="vbHave">
+        <label for="vbFile">Load your Voice Brief (.md)</label>
+        <input id="vbFile" type="file" accept=".md,.txt,text/markdown,text/plain">
+      </div>
+      <div id="vbMake" hidden>
+        <label for="q1">1 — How does your writing sound when it sounds like you? Long sentences or short, plain or dense, linear or associative — describe it, don't judge it.</label>
+        <textarea id="q1"></textarea>
+        <label for="q2">2 — What registers and languages do you move between — home, school, online, other languages or dialects? RiRi treats these as resources, not errors.</label>
+        <textarea id="q2"></textarea>
+        <label for="q3">3 — What have you written before that felt like yours? Paste a short sample if you have one.</label>
+        <textarea id="q3"></textarea>
+        <label for="q4">4 — What should feedback do to your writing, and what should it never do? Be specific: this section is the standard RiRi edits toward.</label>
+        <textarea id="q4"></textarea>
+        <button class="btn ghost" type="button" id="vbGen">Generate &amp; download my Voice Brief</button>
+        <p class="lead" style="margin-top:.5rem">Keep the file. RiRi doesn't store it between sessions — you reload it each time, and you can edit it by hand whenever your sense of your own writing changes.</p>
+      </div>
+    </fieldset>
+    <fieldset>
+      <legend>Mode</legend>
+      <div class="radio-row">
+        <label><input type="radio" name="mode" value="artifact" checked> Artifact — dialogue with the text's author</label>
+        <label><input type="radio" name="mode" value="assignment"> Assignment — staged writing process</label>
+      </div>
+      <div id="authorPick">
+        <label for="authorSel">Author / text</label>
+        <select id="authorSel"></select>
+      </div>
+    </fieldset>
+    <button class="btn" id="beginBtn" type="button">Begin session</button>
+    <p class="err" id="setupErr" role="alert"></p>
+  </div>
+</section>
+
+<!-- CHAT -->
+<section id="chatView" class="view" aria-label="Conversation">
+  <aside id="rail">
+    <div id="stageBlock" hidden>
+      <h3>Writing process</h3>
+      <ol class="stages" id="stageList">
+        <li data-s="invention">1 · Invention</li>
+        <li data-s="development">2 · Development</li>
+        <li data-s="polishing">3 · Polishing</li>
+      </ol>
+    </div>
+    <h3>Session</h3>
+    <p id="railMeta"></p>
+    <button class="btn ghost" id="newSession" type="button">New session</button>
+  </aside>
+  <div class="chat-col">
+    <div id="log" role="log" aria-live="polite" aria-label="Messages"></div>
+    <details id="gateBox" hidden>
+      <summary>Ready to advance? Submit your gate response</summary>
+      <label for="gateText">In at least 100 of your own words, document this stage's work. From Invention: your angle, your evidence, the question you're pursuing, and what "effective" would mean for this text. From Development: your structure stated as moves, and where your draft stands.</label>
+      <textarea id="gateText"></textarea>
+      <button class="btn" id="gateBtn" type="button">Submit &amp; advance</button>
+      <p class="err" id="gateErr" role="alert"></p>
+    </details>
+    <form id="composer">
+      <label class="skip" for="msg">Message RiRi</label>
+      <textarea id="msg" placeholder="Ask, answer, or paste your working material…" required></textarea>
+      <button class="btn" type="submit" id="sendBtn">Send</button>
+    </form>
+  </div>
+</section>
+</main>
+
+<script>
+const $ = s => document.querySelector(s);
+const state = { session:null, mode:null, stage:null, vb:null };
+
+function show(id){ document.querySelectorAll(".view").forEach(v=>v.classList.remove("active")); $(id).classList.add("active"); }
+async function api(path, body){
+  const r = await fetch(path,{method: body?"POST":"GET", headers:{"Content-Type":"application/json"},
+    body: body?JSON.stringify(body):undefined});
+  const data = await r.json().catch(()=>({}));
+  if(!r.ok) throw new Error(data.detail || r.statusText);
+  return data;
+}
+
+/* login */
+$("#loginForm").addEventListener("submit", async e=>{
+  e.preventDefault(); $("#loginErr").textContent="";
+  try{ await api("/api/login",{token:$("#tok").value}); await enterSetup(); }
+  catch(err){ $("#loginErr").textContent = err.message; }
+});
+async function enterSetup(){
+  const auth = await api("/api/authors");
+  $("#authorSel").innerHTML = auth.authors.map(a=>`<option value="${a.slug}">${a.title}</option>`).join("");
+  $("#whoami").textContent = "signed in by token";
+  show("#setupView");
+}
+
+/* voice brief toggles */
+document.querySelectorAll("input[name=vb]").forEach(r=>r.addEventListener("change",()=>{
+  const make = document.querySelector("input[name=vb]:checked").value==="make";
+  $("#vbMake").hidden=!make; $("#vbHave").hidden=make;
+}));
+document.querySelectorAll("input[name=mode]").forEach(r=>r.addEventListener("change",()=>{
+  $("#authorPick").hidden = document.querySelector("input[name=mode]:checked").value!=="artifact";
+}));
+$("#vbGen").addEventListener("click", async ()=>{
+  try{
+    const d = await api("/api/voice-brief",{style:$("#q1").value,register:$("#q2").value,
+      context:$("#q3").value,goals:$("#q4").value});
+    state.vb = d.markdown;
+    const blob = new Blob([d.markdown],{type:"text/markdown"});
+    const a = Object.assign(document.createElement("a"),{href:URL.createObjectURL(blob),download:"riri-voice-brief.md"});
+    a.click(); URL.revokeObjectURL(a.href);
+  }catch(err){ $("#setupErr").textContent = err.message; }
+});
+$("#vbFile").addEventListener("change", e=>{
+  const f = e.target.files[0]; if(!f) return;
+  f.text().then(t=>{ state.vb = t; });
+});
+
+/* begin session */
+$("#beginBtn").addEventListener("click", async ()=>{
+  $("#setupErr").textContent="";
+  const mode = document.querySelector("input[name=mode]:checked").value;
+  try{
+    const d = await api("/api/session",{mode, author_slug: mode==="artifact"?$("#authorSel").value:null,
+      voice_brief_md: state.vb});
+    Object.assign(state,{session:d.session_id, mode:d.mode, stage:d.stage});
+    $("#log").innerHTML="";
+    $("#stageBlock").hidden = mode!=="assignment";
+    $("#gateBox").hidden = mode!=="assignment";
+    $("#railMeta").textContent = mode==="artifact"
+      ? "Artifact Mode — you are questioning a simulated author."
+      : "Assignment Mode — advancement requires documented work. RiRi diagnoses; you revise.";
+    paintStages(); show("#chatView"); $("#msg").focus();
+    addMsg("riri", mode==="artifact"
+      ? "I'm a simulation of the author, built from your instructor's materials. Ask me about the text — I'll answer as the writer would, and I'll push back."
+      : "We start in Invention. Before any thesis exists: what did this text do to you on first read, and where exactly did it do it?");
+  }catch(err){ $("#setupErr").textContent = err.message; }
+});
+function paintStages(){
+  const order=["invention","development","polishing"], i=order.indexOf(state.stage);
+  document.querySelectorAll("#stageList li").forEach((li,n)=>{
+    li.className = n<i?"done":(n===i?"now":"");
+    li.setAttribute("aria-current", n===i?"step":"false");
+  });
+}
+function addMsg(who,text){
+  const d=document.createElement("div"); d.className="msg "+(who==="user"?"user":"riri");
+  const w=document.createElement("span"); w.className="who"; w.textContent = who==="user"?"You":"RiRi · AI";
+  d.append(w, document.createTextNode(text)); $("#log").append(d);
+  $("#log").scrollTop = $("#log").scrollHeight;
+}
+
+/* chat */
+$("#composer").addEventListener("submit", async e=>{
+  e.preventDefault();
+  const text=$("#msg").value.trim(); if(!text) return;
+  addMsg("user",text); $("#msg").value=""; $("#sendBtn").disabled=true;
+  try{ const d = await api("/api/chat",{session_id:state.session,message:text}); addMsg("riri",d.reply); }
+  catch(err){ addMsg("riri","⚠ "+err.message); }
+  $("#sendBtn").disabled=false; $("#msg").focus();
+});
+
+/* gates */
+$("#gateBtn").addEventListener("click", async ()=>{
+  $("#gateErr").textContent="";
+  try{
+    const d = await api("/api/gate",{session_id:state.session,submission:$("#gateText").value});
+    state.stage=d.stage; paintStages(); $("#gateText").value=""; $("#gateBox").removeAttribute("open");
+    addMsg("riri", d.stage==="development"
+      ? "Gate logged. Development: paste your working notes or rough outline. I'll map each unit as the move it makes — not the topic it covers — and label every transition ADVANCE or CIRCLE BACK."
+      : "Gate logged. Polishing does two different jobs. Paste your full draft and ask about structure for a macro audit — whether the essay moves forward or orbits one point. Paste a paragraph for a micro reading of what its lines are doing. Say which you want.");
+  }catch(err){ $("#gateErr").textContent = err.message; }
+});
+$("#newSession").addEventListener("click", ()=>{ show("#setupView"); });
+
+/* resume if cookie valid */
+api("/api/me").then(enterSetup).catch(()=>show("#loginView"));
+</script>
+</body>
+</html>

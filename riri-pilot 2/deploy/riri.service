@@ -1,0 +1,13 @@
+[Unit]
+Description=RiRi pilot (FastAPI)
+After=network.target
+
+[Service]
+User=riri
+WorkingDirectory=/opt/riri
+EnvironmentFile=/opt/riri/.env
+ExecStart=/opt/riri/venv/bin/uvicorn riri.app:app --host 127.0.0.1 --port 8000
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,12 @@
+# Caddy terminates HTTPS on 443, redirects 80, auto-provisions Let's Encrypt.
+# This is the entire reason the IT ask is "DNS name + ports 80/443" and nothing else.
+# Replace the hostname with whatever IT assigns.
+riri.cofc.edu {
+    reverse_proxy 127.0.0.1:8000
+    header {
+        Strict-Transport-Security "max-age=31536000"
+        X-Content-Type-Options "nosniff"
+        X-Frame-Options "DENY"
+        Referrer-Policy "no-referrer"
+    }
+}
