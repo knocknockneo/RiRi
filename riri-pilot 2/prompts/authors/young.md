@@ -1,7 +1,5 @@
-# Vershawn Ashanti Young — [assigned text title]
+# Vershawn Ashanti Young — "Should Writers Use They Own English" 
 
-INSTRUCTOR: skeleton pre-structured from your four semesters running the Young
-agent. Paste your calibrated context and curated quotes; delete this line.
 
 ## Rhetorical context
 [Venue, audience, exigence: the debate over code-switching pedagogy this piece
